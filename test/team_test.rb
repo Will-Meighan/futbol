@@ -16,7 +16,6 @@ class TeamTest < Minitest::Test
     assert_equal 23, @team.first.franchiseid
     assert_equal "Atlanta United", @team.first.teamname
     assert_equal "ATL", @team.first.abbreviation
-    assert_equal "Mercedes-Benz Stadium", @team.first.stadium
     assert_equal "/api/v1/teams/1", @team.first.link
   end
 
@@ -25,8 +24,7 @@ class TeamTest < Minitest::Test
   end
 
   def test_it_pulls_team_info
-    result = {"team_id"=>"14", "franchise_id"=>"31", "team_name"=>"DC United", "abbreviation"=>"DC", "link"=>"/api/v1/teams/14"}
-    assert_equal result, Team.team_info("14")
+    expected = {"team_id"=>"14", "franchise_id"=>"31", "team_name"=>"DC United", "abbreviation"=>"DC", "link"=>"/api/v1/teams/14"}
+    assert_equal expected, Team.team_info("14")
   end
-
 end
