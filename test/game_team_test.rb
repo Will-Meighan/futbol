@@ -16,17 +16,10 @@ class GameTeamTest < Minitest::Test
     assert_equal 24, @game_team.first.team_id
     assert_equal "away", @game_team.first.hoa
     assert_equal "TIE", @game_team.first.result
-    assert_equal "SO", @game_team.first.settled_in
     assert_equal "Bruce Boudreau", @game_team.first.head_coach
     assert_equal 2, @game_team.first.goals
     assert_equal 7, @game_team.first.shots
     assert_equal 22, @game_team.first.tackles
-    assert_equal 4, @game_team.first.pim
-    assert_equal 4, @game_team.first.powerplayopportunities
-    assert_equal 0, @game_team.first.powerplaygoals
-    assert_equal 46.0, @game_team.first.faceoffwinpercentage
-    assert_equal 14, @game_team.first.giveaways
-    assert_equal 7, @game_team.first.takeaways
   end
 
   def test_percentage_vistor_team_wins
