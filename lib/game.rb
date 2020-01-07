@@ -42,11 +42,8 @@ class Game
   end
 
   def self.count_of_games_by_season
-    @@games.reduce({}) do |acc, game_1|
-      games_per_season = @@games.find_all do |game_2|
-        game_2.season == game_1.season
-      end
-      acc[game_1.season] = games_per_season.length
+    @@games.reduce(Hash.new(0)) do |acc, game_1|
+      acc[game_1.season] += 1
       acc
     end
   end
@@ -74,7 +71,7 @@ class Game
 
   def self.biggest_blowout
     all_abs_vals = []
-    @@games.each do |game| 
+    @@games.each do |game|
       all_abs_vals << (game.home_goals - game.away_goals).abs
     end
     all_abs_vals.max
