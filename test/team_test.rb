@@ -24,7 +24,7 @@ class TeamTest < Minitest::Test
   end
 
   def test_it_pulls_team_info
-    expected = {"team_id"=>"14", "team_name"=>"DC United"}
+    expected = {"team_id"=>"14", "franchise_id"=>"31", "team_name"=>"DC United", "abbreviation"=>"DC", "link"=>"/api/v1/teams/14"}
     assert_equal expected, Team.team_info("14")
   end
 end

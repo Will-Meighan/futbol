@@ -34,8 +34,12 @@ class GameTeam
   end
 
   def self.percentage_visitor_wins
-    away_games = @@game_teams.count { |game_team| game_team.hoa == "away" }
-    away_wins = @@game_teams.count { |game_team| game_team.result == "WIN" && game_team.hoa == "away" }
+    away_games = @@game_teams.count do |game_team|
+      game_team.hoa == "away"
+    end
+    away_wins = @@game_teams.count do |game_team|
+      game_team.result == "WIN" && game_team.hoa == "away"
+    end
     average_of(away_wins, away_games)
   end
 
@@ -43,14 +47,10 @@ class GameTeam
     total_wins = 0
     total_games = 0
     @@game_teams.each do |game|
-      if game.hoa == "home" && game.result == "WIN"
-        total_wins += 1
-      end
+      total_wins += 1 if game.hoa == "home" && game.result == "WIN"
     end
     @@game_teams.each do |game|
-      if game.hoa == "home"
-        total_games += 1
-      end
+      total_games += 1 if game.hoa == "home"
     end
     average_of(total_wins, total_games)
   end
