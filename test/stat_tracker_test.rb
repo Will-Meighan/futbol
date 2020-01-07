@@ -49,12 +49,26 @@ class StatTrackerTest < Minitest::Test
     assert_equal ({"20122013"=>27, "20142015"=>6, "20162017"=>4, "20152016"=>2, "20132014"=>1}), @stat_tracker.count_of_games_by_season
   end
 
-  def test_it_can_find_average_goals_by_season
+  def test_it_can_find_count_of_games_by_season
     assert_equal ({"20122013"=>27, "20142015"=>6, "20162017"=>4, "20152016"=>2, "20132014"=>1}), @stat_tracker.count_of_games_by_season
   end
 
+  def test_it_can_find_average_goals_by_season
+    expected = {"20122013"=>22.04, "20142015"=>4.0, "20162017"=>4.75, "20152016"=>4.0, "20132014"=>5.0}
+    assert_equal expected, @stat_tracker.average_goals_by_season
+  end
+
   def test_it_can_find_count_of_teams
-    assert_equal 16, Team.count_of_teams
+    assert_equal 16, @stat_tracker.count_of_teams
+  end
+
+  def test_it_can_find_team_info
+    expected = {"team_id"=>"14", "franchise_id"=>"31", "team_name"=>"DC United", "abbreviation"=>"DC", "link"=>"/api/v1/teams/14"}
+    assert_equal expected, @stat_tracker.team_info("14")
+  end
+
+  def test_it_can_find_biggest_blowout
+    assert_equal 499, @stat_tracker.biggest_blowout
   end
 
   def test_it_can_pull_all_teams_with_the_worst_fans
