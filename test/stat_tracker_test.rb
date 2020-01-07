@@ -222,4 +222,27 @@ class StatTrackerTest < Minitest::Test
                 :average_goals_scored=>2.2, :average_goals_against=>1.6}}}
     assert_equal expected, @stat_tracker.seasonal_summary("16")
   end
+
+  def test_accurate_team_calculation
+    result = {24=>{:goals=>7, :attempts=>21}, 28=>{:goals=>2, :attempts=>4}, 16=>{:goals=>10, :attempts=>44}, 30=>{:goals=>5, :attempts=>19}, 19=>{:goals=>5, :attempts=>19}, 17=>{:goals=>10,:attempts=>32}, 2=>{:goals=>2, :attempts=>21}, 1=>{:goals=>5, :attempts=>12}, 14=>{:goals=>2, :attempts=>4}, 4=>{:goals=>3, :attempts=>8}, 15=>{:goals=>6, :attempts=>23}, 5=>{:goals=>8, :attempts=>46}, 3=>{:goals=>9, :attempts=>53}, 26=>{:goals=>2, :attempts=>12}, 6=>{:goals=>24, :attempts=>76}}
+    assert_equal result, @stat_tracker.accurate_team_calculation("20122013")
+  end
+
+  def test_game_team_ids_away_home
+    result = {24=>{:away=>0, :home=>0}, 28=>{:away=>0, :home=>0}, 16=>{:away=>0, :home=>0}, 30=>{:away=>0, :home=>0}, 19=>{:away=>0, :home=>0}, 17=>{:away=>0, :home=>0}, 2=>{:away=>0, :home=>0}, 1=>{:away=>0, :home=>0}, 14=>{:away=>0, :home=>0}, 4=>{:away=>0, :home=>0}, 15=>{:away=>0, :home=>0}, 5=>{:away=>0, :home=>0}, 3=>{:away=>0, :home=>0}, 26=>{:away=>0, :home=>0}, 6=>{:away=>0, :home=>0}, 20=>{:away=>0, :home=>0}}
+
+    assert_equal result, @stat_tracker.game_team_ids_away_home(@stat_tracker.game_teams)
+  end
+
+  def test_game_team_ids_games_and_goals
+    result = {24=>{:total_games=>0, :total_goals=>0}, 28=>{:total_games=>0, :total_goals=>0}, 16=>{:total_games=>0, :total_goals=>0}, 30=>{:total_games=>0, :total_goals=>0}, 19=>{:total_games=>0, :total_goals=>0}, 17=>{:total_games=>0, :total_goals=>0}, 2=>{:total_games=>0, :total_goals=>0}, 1=>{:total_games=>0, :total_goals=>0}, 14=>{:total_games=>0, :total_goals=>0}, 4=>{:total_games=>0, :total_goals=>0}, 15=>{:total_games=>0, :total_goals=>0}, 5=>{:total_games=>0, :total_goals=>0}, 3=>{:total_games=>0, :total_goals=>0}, 26=>{:total_games=>0, :total_goals=>0}, 6=>{:total_games=>0, :total_goals=>0}, 20=>{:total_games=>0, :total_goals=>0}}
+
+    assert_equal result, @stat_tracker.game_team_ids_games_and_goals(@stat_tracker.game_teams)
+  end
+
+  def test_game_team_ids
+    result = {24=>0, 28=>0, 16=>0, 30=>0, 19=>0, 17=>0, 2=>0, 1=>0, 14=>0, 4=>0, 15=>0, 5=>0, 3=>0, 26=>0, 6=>0, 20=>0}
+
+    assert_equal result, @stat_tracker.game_team_ids(@stat_tracker.game_teams, 0)
+  end
 end

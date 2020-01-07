@@ -1,8 +1,10 @@
 require_relative 'game_team'
 require_relative 'game'
 require_relative 'team'
+require_relative 'calculable'
 
 class StatTracker
+  include Calculable
   attr_reader :game_path, :team_path, :game_teams_path, :game_teams, :games, :teams
 
   def self.from_csv(locations)
@@ -78,10 +80,7 @@ class StatTracker
   end
 
   def worst_fans
-    unique_teams = @game_teams.reduce({}) do |acc, game_team|
-      acc[game_team.team_id] = {away: 0, home: 0}
-      acc
-    end
+    unique_teams = game_team_ids_away_home(@game_teams)
 
     @game_teams.each do |game_team|
       if game_team.hoa == "away" && game_team.result == "WIN"
@@ -107,22 +106,24 @@ class StatTracker
   end
 
   def best_fans
-    unique_teams = @game_teams.reduce({}) do |acc, game_team|
-      acc[game_team.team_id] = {away: 0, home: 0}
-      acc
-    end
+    unique_teams = game_team_ids(@game_teams, 0)
+
     @game_teams.each do |game_team|
-      unique_teams[game_team.team_id][:away] += 1 if game_team.hoa == "away" && game_team.result == "WIN"
+      unique_teams[game_team.team_id] += 1 if game_team.hoa == "away" && game_team.result == "WIN"
     end
-    best_fans = unique_teams.max_by { |team| team[1][:home] - team[1][:away] }
-    (@teams.find { |team| team.team_id == best_fans[0] }).teamname
+
+    best_fans = unique_teams.min_by do |team|
+      team[1]
+    end
+
+    @teams.find do |team|
+      team.team_id == best_fans[0]
+    end.teamname
   end
 
   def best_offense
-    team_goals = @game_teams.reduce({}) do |acc, game_team|
-      acc[game_team.team_id] = 0
-      acc
-    end
+    team_goals = game_team_ids(@game_teams, 0)
+
      @game_teams.each do |game_team|
       team_goals[game_team.team_id] += game_team.goals
     end
@@ -141,11 +142,10 @@ class StatTracker
   end
 
   def worst_offense
-    team_goals = @game_teams.reduce({}) do |acc, game_team|
-      acc[game_team.team_id] = 0
-      acc
-    end
-    @game_teams.each do |game_team|
+    team_goals = game_team_ids(@game_teams, 0)
+
+     @game_teams.each do |game_team|
+
       team_goals[game_team.team_id] += game_team.goals
     end
     total_games = @game_teams.reduce({}) do |acc, game_team|
@@ -213,10 +213,8 @@ class StatTracker
   end
 
   def highest_scoring_visitor
-    team_goals = @game_teams.reduce({}) do |acc, game_team|
-      acc[game_team.team_id] = {:total_games => 0, :total_goals => 0}
-      acc
-    end
+    team_goals = game_team_ids_games_and_goals(@game_teams)
+
     @game_teams.each do |game_team|
       if game_team.hoa == "away"
         team_goals[game_team.team_id][:total_games] += 1
@@ -230,10 +228,8 @@ class StatTracker
   end
 
   def lowest_scoring_visitor
-    all_teams = @game_teams.reduce({}) do |acc, game_team|
-      acc[game_team.team_id] = {total_games: 0, total_goals: 0}
-      acc
-    end
+    all_teams = game_team_ids_games_and_goals(@game_teams)
+
     @game_teams.each do |game_team|
       if game_team.hoa == "away"
         all_teams[game_team.team_id][:total_games] += 1
@@ -305,7 +301,7 @@ class StatTracker
     (stats_repo.max_by { |k,v|v[:total_wins] / v[:total_games].to_f })[0]
   end
 
-  def least_accurate_team(season_id)
+  def accurate_team_calculation(season_id)
     game_ids = []
     @games.each do |game|
       if game.season == season_id
@@ -324,6 +320,12 @@ class StatTracker
         teams_counter[game_team.team_id][:attempts] += game_team.shots
       end
     end
+    teams_counter
+  end
+
+  def least_accurate_team(season_id)
+    teams_counter = accurate_team_calculation(season_id)
+    
     final = teams_counter.max_by do |key, value|
       value[:attempts].to_f / value[:goals]
     end[0]
@@ -331,29 +333,16 @@ class StatTracker
   end
 
   def most_accurate_team(season_id)
-    game_ids = []
-    @games.each do |game|
-      if game.season == season_id
-        game_ids << game.game_id
-      end
-    end
-    teams_counter = @game_teams.reduce({}) do |acc, game_team|
-      if game_ids.include?(game_team.game_id)
-        acc[game_team.team_id] = {goals: 0, attempts: 0}
-      end
-      acc
-    end
-    @game_teams.each do |game_team|
-      if game_ids.include?(game_team.game_id)
-        teams_counter[game_team.team_id][:goals] += game_team.goals
-        teams_counter[game_team.team_id][:attempts] += game_team.shots
-      end
-    end
-    final = teams_counter.min_by do |key, value|
-      value[:attempts].to_f / value[:goals]
-    end[0]
-    (@teams.find { |team| final == team.team_id }).teamname
-  end
+   teams_counter = accurate_team_calculation(season_id)
+
+   final = teams_counter.min_by do |key, value|
+     value[:attempts].to_f / value[:goals]
+   end[0]
+
+   @teams.find do |team|
+     final == team.team_id
+   end.teamname
+end
 
   def worst_coach(season_id)
     needed_game_ids = []
