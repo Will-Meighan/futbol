@@ -3,11 +3,11 @@ require_relative 'csv_loadable'
 
 class Team
   extend CsvLoadable
+
   attr_reader :team_id,
               :franchiseid,
               :teamname,
               :abbreviation,
-              :stadium,
               :link
 
   @@teams = []
@@ -22,7 +22,6 @@ class Team
     @franchiseid = team_info[:franchiseid].to_i
     @teamname = team_info[:teamname]
     @abbreviation = team_info[:abbreviation]
-    @stadium = team_info[:stadium]
     @link = team_info[:link]
   end
 

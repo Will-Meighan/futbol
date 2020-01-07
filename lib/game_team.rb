@@ -1,24 +1,19 @@
 require 'csv'
 require_relative 'csv_loadable'
+require_relative 'calculable'
 
 class GameTeam
   extend CsvLoadable
+  extend Calculable
 
   attr_reader :game_id,
               :team_id,
               :hoa,
               :result,
-              :settled_in,
               :head_coach,
               :goals,
               :shots,
-              :tackles,
-              :pim,
-              :powerplayopportunities,
-              :powerplaygoals,
-              :faceoffwinpercentage,
-              :giveaways,
-              :takeaways
+              :tackles
 
   @@game_teams = []
 
@@ -32,43 +27,32 @@ class GameTeam
     @team_id = game_team_info[:team_id].to_i
     @hoa = game_team_info[:hoa]
     @result = game_team_info[:result]
-    @settled_in = game_team_info[:settled_in]
     @head_coach = game_team_info[:head_coach]
     @goals = game_team_info[:goals].to_i
     @shots = game_team_info[:shots].to_i
     @tackles = game_team_info[:tackles].to_i
-    @pim = game_team_info[:pim].to_i
-    @powerplayopportunities = game_team_info[:powerplayopportunities].to_i
-    @powerplaygoals = game_team_info[:powerplaygoals].to_i
-    @faceoffwinpercentage = game_team_info[:faceoffwinpercentage].to_f
-    @giveaways = game_team_info[:giveaways].to_i
-    @takeaways = game_team_info[:takeaways].to_i
   end
 
   def self.percentage_visitor_wins
     away_games = @@game_teams.count do |game_team|
-       game_team.hoa == "away"
+      game_team.hoa == "away"
     end
     away_wins = @@game_teams.count do |game_team|
       game_team.result == "WIN" && game_team.hoa == "away"
     end
-    (away_wins.to_f / away_games).round(2)
+    average_of(away_wins, away_games)
   end
 
   def self.percentage_home_wins
     total_wins = 0
     total_games = 0
     @@game_teams.each do |game|
-      if game.hoa == "home" && game.result == "WIN"
-        total_wins += 1
-      end
+      total_wins += 1 if game.hoa == "home" && game.result == "WIN"
     end
     @@game_teams.each do |game|
-      if game.hoa == "home"
-        total_games += 1
-      end
+      total_games += 1 if game.hoa == "home"
     end
-    (total_wins.to_f / total_games).round(2)
+    average_of(total_wins, total_games)
   end
 
   def self.most_goals_scored(team_id)
@@ -92,15 +76,8 @@ class GameTeam
   end
 
   def self.average_win_percentage(id)
-    total_games = @@game_teams.find_all do |game_team|
-      game_team.team_id == id.to_i
-    end
-
-    games_won = total_games.find_all do |game_team|
-      game_team.result == "WIN"
-    end
-
+    total_games = @@game_teams.find_all { |game_team| game_team.team_id == id.to_i }
+    games_won = total_games.find_all { |game_team| game_team.result == "WIN" }
     (games_won.length / total_games.length.to_f).round(2)
   end
-
 end
