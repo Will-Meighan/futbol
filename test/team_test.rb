@@ -13,7 +13,10 @@ class TeamTest < Minitest::Test
 
   def test_it_has_attributes
     assert_equal 1, @team.first.team_id
+    assert_equal 23, @team.first.franchiseid
     assert_equal "Atlanta United", @team.first.teamname
+    assert_equal "ATL", @team.first.abbreviation
+    assert_equal "/api/v1/teams/1", @team.first.link
   end
 
   def test_it_can_calculate_total_teams

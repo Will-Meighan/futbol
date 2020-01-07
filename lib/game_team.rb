@@ -1,8 +1,10 @@
 require 'csv'
 require_relative 'csv_loadable'
+require_relative 'calculable'
 
 class GameTeam
   extend CsvLoadable
+  extend Calculable
 
   attr_reader :game_id,
               :team_id,
@@ -32,13 +34,9 @@ class GameTeam
   end
 
   def self.percentage_visitor_wins
-    away_games = @@game_teams.count do |game_team|
-       game_team.hoa == "away"
-    end
-    away_wins = @@game_teams.count do |game_team|
-      game_team.result == "WIN" && game_team.hoa == "away"
-    end
-    (away_wins.to_f / away_games).round(2)
+    away_games = @@game_teams.count { |game_team| game_team.hoa == "away" }
+    away_wins = @@game_teams.count { |game_team| game_team.result == "WIN" && game_team.hoa == "away" }
+    average_of(away_wins, away_games)
   end
 
   def self.percentage_home_wins
@@ -54,7 +52,7 @@ class GameTeam
         total_games += 1
       end
     end
-    (total_wins.to_f / total_games).round(2)
+    average_of(total_wins, total_games)
   end
 
   def self.most_goals_scored(team_id)
@@ -78,14 +76,8 @@ class GameTeam
   end
 
   def self.average_win_percentage(id)
-    total_games = @@game_teams.find_all do |game_team|
-      game_team.team_id == id.to_i
-    end
-
-    games_won = total_games.find_all do |game_team|
-      game_team.result == "WIN"
-    end
-
+    total_games = @@game_teams.find_all { |game_team| game_team.team_id == id.to_i }
+    games_won = total_games.find_all { |game_team| game_team.result == "WIN" }
     (games_won.length / total_games.length.to_f).round(2)
   end
 end

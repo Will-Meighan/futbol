@@ -32,16 +32,12 @@ class Game
   end
 
   def self.highest_total_score
-    most_goals = @@games.max_by do |game|
-      game.home_goals + game.away_goals
-    end
+    most_goals = @@games.max_by { |game| game.home_goals + game.away_goals }
     most_goals.home_goals + most_goals.away_goals
   end
 
   def self.lowest_total_score
-    least_goals = @@games.min_by do |game|
-      game.home_goals + game.away_goals
-    end
+    least_goals = @@games.min_by { |game| game.home_goals + game.away_goals }
     least_goals.home_goals + least_goals.away_goals
   end
 
@@ -71,16 +67,12 @@ class Game
       acc[game_1.season] = games_per_season.sum { |game| game.home_goals + game.away_goals }
       acc
     end
-    count_of_games_by_season.merge(goal_count_per_season) do |key, game_count, goal_count|
-      average_of(goal_count, game_count)
-    end
+    count_of_games_by_season.merge(goal_count_per_season) { |key, game_count, goal_count| average_of(goal_count, game_count) }
   end
 
   def self.biggest_blowout
     all_abs_vals = []
-    @@games.each do |game|
-      all_abs_vals << (game.home_goals - game.away_goals).abs
-    end
+    @@games.each { |game| all_abs_vals << (game.home_goals - game.away_goals).abs }
     all_abs_vals.max
   end
 

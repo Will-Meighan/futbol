@@ -5,7 +5,10 @@ class Team
   extend CsvLoadable
 
   attr_reader :team_id,
-              :teamname
+              :franchiseid,
+              :teamname,
+              :abbreviation,
+              :link
 
   @@teams = []
 
@@ -16,7 +19,10 @@ class Team
 
   def initialize(team_info)
     @team_id = team_info[:team_id].to_i
+    @franchiseid = team_info[:franchiseid].to_i
     @teamname = team_info[:teamname]
+    @abbreviation = team_info[:abbreviation]
+    @link = team_info[:link]
   end
 
   def self.count_of_teams
@@ -28,7 +34,9 @@ class Team
       team.team_id.to_s == team_id
     end
     { "team_id" => final_team.team_id.to_s,
-      "team_name" => final_team.teamname
-    }
+      "franchise_id" => final_team.franchiseid.to_s,
+      "team_name" => final_team.teamname,
+      "abbreviation" => final_team.abbreviation,
+      "link" => final_team.link }
   end
 end
