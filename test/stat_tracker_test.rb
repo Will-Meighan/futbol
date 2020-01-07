@@ -194,6 +194,7 @@ class StatTrackerTest < Minitest::Test
   end
 
   def test_seasonal_summary
-    assert_equal ({}), @stat_tracker.seasonal_summary("16")
+    expected = {"20122013"=>{:regular_season=>{:win_percentage=>0.0, :total_goals_scored=>2, :total_goals_against=>2, :average_goals_scored=>2.0, :average_goals_against=>2.0}, :postseason=>{:win_percentage=>0.75, :total_goals_scored=>8, :total_goals_against=>6, :average_goals_scored=>2.0, :average_goals_against=>1.5}}, "20142015"=>{:regular_season=>{:win_percentage=>0.0, :total_goals_scored=>0, :total_goals_against=>0, :average_goals_scored=>0.0, :average_goals_against=>0.0}, :postseason=>{:win_percentage=>0.8, :total_goals_scored=>11, :total_goals_against=>8, :average_goals_scored=>2.2, :average_goals_against=>1.6}}}
+    assert_equal expected, @stat_tracker.seasonal_summary("16")
   end
 end
