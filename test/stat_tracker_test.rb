@@ -193,6 +193,10 @@ class StatTrackerTest < Minitest::Test
     assert_equal "DC United", @stat_tracker.favorite_opponent("16")
   end
 
+  def test_percentage_visitor_wins
+    assert_equal 0.34, @stat_tracker.percentage_visitor_wins
+  end
+
   def test_seasonal_summary
     expected = {"20122013"=>{:regular_season=>{:win_percentage=>0.0, :total_goals_scored=>2,
                 :total_goals_against=>2, :average_goals_scored=>2.0, :average_goals_against=>2.0},
