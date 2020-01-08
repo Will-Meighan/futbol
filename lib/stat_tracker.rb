@@ -6,9 +6,11 @@ require_relative 'gameteam_team_aggregable'
 require_relative 'game_team_aggregable'
 require_relative 'gameteam_game_aggregable'
 require_relative 'gameteam_game_team_aggregable'
+require_relative 'teamnameable'
 
 class StatTracker
   include Calculable
+  include Teamnameable
   attr_reader :game_path, :team_path, :game_teams_path, :game_teams, :games, :teams
 
   def self.from_csv(locations)
