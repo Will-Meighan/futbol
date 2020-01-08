@@ -40,7 +40,7 @@ class GameTeam
     away_wins = @@game_teams.count do |game_team|
       game_team.result == "WIN" && game_team.hoa == "away"
     end
-    average_of(away_wins, away_games)
+    average_of(away_wins, away_games).round(2)
   end
 
   def self.percentage_home_wins
@@ -52,7 +52,7 @@ class GameTeam
     @@game_teams.each do |game|
       total_games += 1 if game.hoa == "home"
     end
-    average_of(total_wins, total_games)
+    average_of(total_wins, total_games).round(2)
   end
 
   def self.most_goals_scored(team_id)

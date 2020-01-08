@@ -23,6 +23,5 @@ module Calculable
       acc[game_team.team_id] = value
       acc
     end
-    (total / out_of.to_f).round(2)
   end
 end
