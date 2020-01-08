@@ -250,4 +250,11 @@ class StatTrackerTest < Minitest::Test
     result = {3=>{:goals=>0, :attempts=>0}, 6=>{:goals=>0, :attempts=>0}}
     assert_equal result, GameteamGameTeamAggregable.teams_counter_hash_for_accuracy_methods(@stat_tracker.game_teams, game_ids)
   end
+
+  def test_accuracy_incrementer
+    teams_counter = {3=>{:goals=>0, :attempts=>0}, 6=>{:goals=>0, :attempts=>0}}
+    game_ids = [2012030221, 2012030222, 2012030223, 2012030224]
+    result = {3=>{:goals=>0, :attempts=>0}, 6=>{:goals=>0, :attempts=>0}}
+    assert_equal 2012020087, GameteamGameTeamAggregable.accuracy_incrementer(@stat_tracker.game_teams, game_ids, teams_counter)[0].game_id
+  end
 end

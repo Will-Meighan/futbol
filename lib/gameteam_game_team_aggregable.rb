@@ -12,6 +12,15 @@ module GameteamGameTeamAggregable
     end
   end
 
+  def self.accuracy_incrementer(game_teams, game_ids, teams_counter)
+    game_teams.each do |game_team|
+      if game_ids.include?(game_team.game_id)
+        teams_counter[game_team.team_id][:goals] += game_team.goals
+        teams_counter[game_team.team_id][:attempts] += game_team.shots
+      end
+    end
+  end
+
   def self.accurate_team_calculation(season_id, game_teams, games, teams)
     game_ids = []
     games.each do |game|
@@ -21,13 +30,7 @@ module GameteamGameTeamAggregable
     end
 
     teams_counter = teams_counter_hash_for_accuracy_methods(game_teams, game_ids)
-
-    game_teams.each do |game_team|
-      if game_ids.include?(game_team.game_id)
-        teams_counter[game_team.team_id][:goals] += game_team.goals
-        teams_counter[game_team.team_id][:attempts] += game_team.shots
-      end
-    end
+    accuracy_incrementer(game_teams, game_ids, teams_counter)
     teams_counter
   end
 
