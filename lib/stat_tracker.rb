@@ -140,99 +140,33 @@ class StatTracker
   end
 
   def most_accurate_team(season_id)
-   teams_counter = accurate_team_calculation(season_id)
-
-   final = teams_counter.min_by do |key, value|
-     value[:attempts].to_f / value[:goals]
-   end[0]
-
-   @teams.find do |team|
-     final == team.team_id
-   end.teamname
-end
+    GameteamGameTeamAggregable.most_accurate_team(season_id, @game_teams, @games, @teams)
+  end
 
   def worst_coach(season_id)
-    needed_game_ids = []
-    @games.find_all do |game|
-      if game.season == season_id
-        needed_game_ids << game.game_id
-      end
-    end
-    stats_repo = @game_teams.reduce({}) do |acc, game_team|
-      if needed_game_ids.include?(game_team.game_id)
-        acc[game_team.head_coach] = {:total_wins => 0, :total_games => 0 }
-      end
-      acc
-    end
-    @game_teams.each do |game_team|
-      if needed_game_ids.include?(game_team.game_id) && game_team.result == "WIN"
-        stats_repo[game_team.head_coach][:total_wins] += 1
-      elsif needed_game_ids.include?(game_team.game_id)
-        stats_repo[game_team.head_coach][:total_games] += 1
-      end
-    end
-    stats_repo.min_by do |k,v|
-      v[:total_wins] / v[:total_games].to_f
-    end[0]
+    GameteamGameAggregable.worst_coach(season_id, @game_teams, @games)
   end
 
   def most_tackles(season_id)
-    game_ids = []
-    @games.find_all do |game|
-      if game.season == season_id
-        game_ids << game.game_id
-      end
-    end
-    all_teams = @game_teams.reduce({}) do |acc, game_team|
-      acc[game_team.team_id] = {total_tackles: 0}
-      acc
-    end
-    @game_teams.each do |game_team|
-      if game_ids.include?(game_team.game_id)
-    all_teams[game_team.team_id][:total_tackles] += game_team.tackles
-      end
-    end
-    team_with_most_tackles = all_teams.max_by do |team|
-      team.last[:total_tackles]
-    end
-    (@teams.find {|team| team.team_id == team_with_most_tackles.first}).teamname
+    GameteamGameTeamAggregable.most_tackles(season_id, @game_teams, @games, @teams)
   end
 
   def fewest_tackles(season_id)
-    game_ids = []
-    @games.find_all do |game|
-      if game.season == season_id
-        game_ids << game.game_id
-      end
-    end
-    all_teams = @game_teams.reduce({}) do |acc, game_team|
-      if game_ids.include?(game_team.game_id)
-        acc[game_team.team_id] = {total_tackles: 0}
-      end
-      acc
-    end
-    @game_teams.each do |game_team|
-      if all_teams[game_team.team_id] && game_ids.include?(game_team.game_id)
-        all_teams[game_team.team_id][:total_tackles] += game_team.tackles
-      end
-    end
-    team_with_least_tackles = all_teams.min_by do |team|
-      team.last[:total_tackles]
-    end
-    (@teams.find {|team| team.team_id == team_with_least_tackles.first}).teamname
+    GameteamGameTeamAggregable.fewest_tackles(season_id, @game_teams, @games, @teams)
   end
 
   def game_teams_postseason(season_type)
-    postseason = @games.find_all { |game| game.type == "Postseason" && game.season == season_type }
-    postseason_ids = postseason.map { |game| game.game_id }
-    @game_teams.find_all { |game_team| postseason_ids.include?(game_team.game_id) }
+    GameteamGameAggregable.game_teams_postseason(season_type, @game_teams, @games)
   end
 
   def game_teams_regular_season(season_type)
-    regular_season = @games.find_all { |game| game.type == "Regular Season" && game.season == season_type}
-    regular_season_ids = regular_season.map { |game| game.game_id }
-    @game_teams.find_all { |game_team| regular_season_ids.include?(game_team.game_id) }
+    GameteamGameAggregable.game_teams_regular_season(season_type, @game_teams, @games)
   end
+  # def game_teams_regular_season(season_type)
+  #   regular_season = @games.find_all { |game| game.type == "Regular Season" && game.season == season_type}
+  #   regular_season_ids = regular_season.map { |game| game.game_id }
+  #   @game_teams.find_all { |game_team| regular_season_ids.include?(game_team.game_id) }
+  # end
 
   def biggest_bust(season_type)
     postseason_games_per_team = game_teams_postseason(season_type).reduce(Hash.new(0)) do |acc, game_team|

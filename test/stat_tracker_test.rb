@@ -49,26 +49,12 @@ class StatTrackerTest < Minitest::Test
     assert_equal ({"20122013"=>27, "20142015"=>6, "20162017"=>4, "20152016"=>2, "20132014"=>1}), @stat_tracker.count_of_games_by_season
   end
 
-  def test_it_can_find_count_of_games_by_season
+  def test_it_can_find_average_goals_by_season
     assert_equal ({"20122013"=>27, "20142015"=>6, "20162017"=>4, "20152016"=>2, "20132014"=>1}), @stat_tracker.count_of_games_by_season
   end
 
-  def test_it_can_find_average_goals_by_season
-    expected = {"20122013"=>22.04, "20142015"=>4.0, "20162017"=>4.75, "20152016"=>4.0, "20132014"=>5.0}
-    assert_equal expected, @stat_tracker.average_goals_by_season
-  end
-
   def test_it_can_find_count_of_teams
-    assert_equal 16, @stat_tracker.count_of_teams
-  end
-
-  def test_it_can_find_team_info
-    expected = {"team_id"=>"14", "franchise_id"=>"31", "team_name"=>"DC United", "abbreviation"=>"DC", "link"=>"/api/v1/teams/14"}
-    assert_equal expected, @stat_tracker.team_info("14")
-  end
-
-  def test_it_can_find_biggest_blowout
-    assert_equal 499, @stat_tracker.biggest_blowout
+    assert_equal 16, Team.count_of_teams
   end
 
   def test_it_can_pull_all_teams_with_the_worst_fans
@@ -207,10 +193,6 @@ class StatTrackerTest < Minitest::Test
     assert_equal "DC United", @stat_tracker.favorite_opponent("16")
   end
 
-  def test_percentage_visitor_wins
-    assert_equal 0.34, @stat_tracker.percentage_visitor_wins
-  end
-
   def test_seasonal_summary
     expected = {"20122013"=>{:regular_season=>{:win_percentage=>0.0, :total_goals_scored=>2,
                 :total_goals_against=>2, :average_goals_scored=>2.0, :average_goals_against=>2.0},
@@ -221,28 +203,5 @@ class StatTrackerTest < Minitest::Test
                 :postseason=>{:win_percentage=>0.8, :total_goals_scored=>11, :total_goals_against=>8,
                 :average_goals_scored=>2.2, :average_goals_against=>1.6}}}
     assert_equal expected, @stat_tracker.seasonal_summary("16")
-  end
-
-  def test_accurate_team_calculation
-    result = {24=>{:goals=>7, :attempts=>21}, 28=>{:goals=>2, :attempts=>4}, 16=>{:goals=>10, :attempts=>44}, 30=>{:goals=>5, :attempts=>19}, 19=>{:goals=>5, :attempts=>19}, 17=>{:goals=>10,:attempts=>32}, 2=>{:goals=>2, :attempts=>21}, 1=>{:goals=>5, :attempts=>12}, 14=>{:goals=>2, :attempts=>4}, 4=>{:goals=>3, :attempts=>8}, 15=>{:goals=>6, :attempts=>23}, 5=>{:goals=>8, :attempts=>46}, 3=>{:goals=>9, :attempts=>53}, 26=>{:goals=>2, :attempts=>12}, 6=>{:goals=>24, :attempts=>76}}
-    assert_equal result, @stat_tracker.accurate_team_calculation("20122013")
-  end
-
-  def test_game_team_ids_away_home
-    result = {24=>{:away=>0, :home=>0}, 28=>{:away=>0, :home=>0}, 16=>{:away=>0, :home=>0}, 30=>{:away=>0, :home=>0}, 19=>{:away=>0, :home=>0}, 17=>{:away=>0, :home=>0}, 2=>{:away=>0, :home=>0}, 1=>{:away=>0, :home=>0}, 14=>{:away=>0, :home=>0}, 4=>{:away=>0, :home=>0}, 15=>{:away=>0, :home=>0}, 5=>{:away=>0, :home=>0}, 3=>{:away=>0, :home=>0}, 26=>{:away=>0, :home=>0}, 6=>{:away=>0, :home=>0}, 20=>{:away=>0, :home=>0}}
-
-    assert_equal result, @stat_tracker.game_team_ids_away_home(@stat_tracker.game_teams)
-  end
-
-  def test_game_team_ids_games_and_goals
-    result = {24=>{:total_games=>0, :total_goals=>0}, 28=>{:total_games=>0, :total_goals=>0}, 16=>{:total_games=>0, :total_goals=>0}, 30=>{:total_games=>0, :total_goals=>0}, 19=>{:total_games=>0, :total_goals=>0}, 17=>{:total_games=>0, :total_goals=>0}, 2=>{:total_games=>0, :total_goals=>0}, 1=>{:total_games=>0, :total_goals=>0}, 14=>{:total_games=>0, :total_goals=>0}, 4=>{:total_games=>0, :total_goals=>0}, 15=>{:total_games=>0, :total_goals=>0}, 5=>{:total_games=>0, :total_goals=>0}, 3=>{:total_games=>0, :total_goals=>0}, 26=>{:total_games=>0, :total_goals=>0}, 6=>{:total_games=>0, :total_goals=>0}, 20=>{:total_games=>0, :total_goals=>0}}
-
-    assert_equal result, @stat_tracker.game_team_ids_games_and_goals(@stat_tracker.game_teams)
-  end
-
-  def test_game_team_ids
-    result = {24=>0, 28=>0, 16=>0, 30=>0, 19=>0, 17=>0, 2=>0, 1=>0, 14=>0, 4=>0, 15=>0, 5=>0, 3=>0, 26=>0, 6=>0, 20=>0}
-
-    assert_equal result, @stat_tracker.game_team_ids(@stat_tracker.game_teams, 0)
   end
 end
