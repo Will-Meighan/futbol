@@ -207,6 +207,7 @@ class StatTrackerTest < Minitest::Test
 
   def test_teamnameable
     assert_equal "FC Dallas", @stat_tracker.id_to_teamname(6, @stat_tracker.teams)
+  end
 
   def test_biggest_blowout
     assert_equal 499, @stat_tracker.biggest_blowout
@@ -233,14 +234,14 @@ class StatTrackerTest < Minitest::Test
   def test_accurate_team_calculation
     result = {24=>{:goals=>7, :attempts=>21}, 28=>{:goals=>2, :attempts=>4}, 16=>{:goals=>10, :attempts=>44}, 30=>{:goals=>5, :attempts=>19}, 19=>{:goals=>5, :attempts=>19}, 17=>{:goals=>10, :attempts=>32}, 2=>{:goals=>2, :attempts=>21}, 1=>{:goals=>5, :attempts=>12}, 14=>{:goals=>2, :attempts=>4}, 4=>{:goals=>3, :attempts=>8}, 15=>{:goals=>6, :attempts=>23}, 5=>{:goals=>8, :attempts=>46}, 3=>{:goals=>9, :attempts=>53}, 26=>{:goals=>2, :attempts=>12}, 6=>{:goals=>24, :attempts=>76}}
 
-    assert_equal result, @stat_tracker.accurate_team_calculation("20122013")
+    assert_equal result, GameteamGameTeamAggregable.accurate_team_calculation("20122013", @stat_tracker.game_teams, @stat_tracker.games, @stat_tracker.teams)
   end
 
   def test_game_teams_postseason
-    assert_equal [], @stat_tracker.game_teams_postseason("Postseason")
+    assert_equal [], GameteamGameTeamAggregable.game_teams_postseason("Postseason", @stat_tracker.game_teams, @stat_tracker.games, @stat_tracker.teams)
   end
 
   def test_game_teams_regular_season
-    assert_equal [], @stat_tracker.game_teams_regular_season("Regular Season")
+    assert_equal [], GameteamGameTeamAggregable.game_teams_regular_season("Regular Season", @stat_tracker.game_teams, @stat_tracker.games, @stat_tracker.teams)
   end
 end
