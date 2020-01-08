@@ -103,69 +103,65 @@ module GameteamGameTeamAggregable
     game_teams.find_all { |game_team| regular_season_ids.include?(game_team.game_id) }
   end
 
-  def self.biggest_bust(season_type, game_teams, games, teams)
-    postseason_games_per_team = game_teams_postseason(season_type, game_teams, games, teams).reduce(Hash.new(0)) do |acc, game_team|
+  def self.postseason_games_per_team(season_type, game_teams, games, teams)
+    game_teams_postseason(season_type, game_teams, games, teams).reduce(Hash.new(0)) do |acc, game_team|
       acc[game_team.team_id] +=1
       acc
     end
-    postseason_team_wins = game_teams_postseason(season_type, game_teams, games, teams).reduce(Hash.new(0)) do |acc, game_team|
+  end
+
+  def self.postseason_team_wins(season_type, game_teams, games, teams)
+    game_teams_postseason(season_type, game_teams, games, teams).reduce(Hash.new(0)) do |acc, game_team|
       acc[game_team.team_id] += 1 if game_team.result == "WIN"
       acc
     end
-    postseason_win_percentage = postseason_games_per_team.merge(postseason_team_wins) do |game_team, games, wins|
+  end
+
+  def self.postseason_win_percentage(season_type, game_teams, games, teams)
+    postseason_games_per_team(season_type, game_teams, games, teams).merge(postseason_team_wins(season_type, game_teams, games, teams)) do |game_team, games, wins|
       (wins.to_f/games)
     end
-    regular_season_games_per_team = game_teams_regular_season(season_type, game_teams, games, teams).reduce(Hash.new(0)) do |acc, game_team|
+  end
+
+  def self.regular_season_games_per_team(season_type, game_teams, games, teams)
+    game_teams_regular_season(season_type, game_teams, games, teams).reduce(Hash.new(0)) do |acc, game_team|
       acc[game_team.team_id] +=1
       acc
     end
-    regular_season_team_wins = game_teams_regular_season(season_type, game_teams, games, teams).reduce(Hash.new(0)) do |acc, game_team|
+  end
+
+  def self.regular_season_team_wins(season_type, game_teams, games, teams)
+    game_teams_regular_season(season_type, game_teams, games, teams).reduce(Hash.new(0)) do |acc, game_team|
       acc[game_team.team_id] += 1 if game_team.result == "WIN"
       acc
     end
-    regular_season_win_percentage = regular_season_games_per_team.merge(regular_season_team_wins) do |game_team, games, wins|
+  end
+
+  def self.regular_season_win_percentage(season_type, game_teams, games, teams)
+    regular_season_games_per_team(season_type, game_teams, games, teams).merge(regular_season_team_wins(season_type, game_teams, games, teams)) do |game_team, games, wins|
       (wins.to_f/games)
     end
-    difference = regular_season_win_percentage.merge(postseason_win_percentage) do |game_team, regular_percentage, post_percentage|
+  end
+
+  def self.difference(season_type, game_teams, games, teams)
+    regular_season_win_percentage(season_type, game_teams, games, teams).merge(postseason_win_percentage(season_type, game_teams, games, teams)) do |game_team, regular_percentage, post_percentage|
       post_percentage - regular_percentage
     end
-    postseason_teams_only = difference.find_all do |team|
-      postseason_team_wins.keys.include?(team.first)
+  end
+
+  def self.postseason_teams_only(season_type, game_teams, games, teams)
+    difference(season_type, game_teams, games, teams).find_all do |team|
+      postseason_team_wins(season_type, game_teams, games, teams).keys.include?(team.first)
     end
-    team_with_biggest_bust = difference.max_by { |team| team.last }
+  end
+
+  def self.biggest_bust(season_type, game_teams, games, teams)
+    team_with_biggest_bust = difference(season_type, game_teams, games, teams).max_by { |team| team.last }
     (teams.find {|team| team.team_id == team_with_biggest_bust.first}).teamname
   end
 
   def self.biggest_surprise(season_type, game_teams, games, teams)
-    postseason_games_per_team = game_teams_postseason(season_type, game_teams, games, teams).reduce(Hash.new(0)) do |acc, game_team|
-      acc[game_team.team_id] +=1
-      acc
-    end
-    postseason_team_wins = game_teams_postseason(season_type, game_teams, games, teams).reduce(Hash.new(0)) do |acc, game_team|
-      acc[game_team.team_id] += 1 if game_team.result == "WIN"
-      acc
-    end
-    postseason_win_percentage = postseason_games_per_team.merge(postseason_team_wins) do |game_team, games, wins|
-      (wins.to_f/games)
-    end
-    regular_season_games_per_team = game_teams_regular_season(season_type, game_teams, games, teams).reduce(Hash.new(0)) do |acc, game_team|
-      acc[game_team.team_id] +=1
-      acc
-    end
-    regular_season_team_wins = game_teams_regular_season(season_type, game_teams, games, teams).reduce(Hash.new(0)) do |acc, game_team|
-      acc[game_team.team_id] += 1 if game_team.result == "WIN"
-      acc
-    end
-    regular_season_win_percentage = regular_season_games_per_team.merge(regular_season_team_wins) do |game_team, games, wins|
-      (wins.to_f/games)
-    end
-    difference = regular_season_win_percentage.merge(postseason_win_percentage) do |game_team, regular_percentage, post_percentage|
-      post_percentage - regular_percentage
-    end
-    postseason_teams_only = difference.find_all do |team|
-      postseason_team_wins.keys.include?(team.first)
-    end
-    team_biggest_surprise = postseason_teams_only.max_by {|team| team.last}
+    team_biggest_surprise = postseason_teams_only(season_type, game_teams, games, teams).max_by {|team| team.last}
     (teams.find {|team| team.team_id == team_biggest_surprise.first}).teamname
   end
 end
