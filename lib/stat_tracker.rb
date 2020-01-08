@@ -36,19 +36,19 @@ class StatTracker
   end
 
   def average_goals_per_game
-    Game.average_goals_per_game
+    Game.average_goals_per_game.round(2)
   end
 
   def percentage_home_wins
-    GameTeam.percentage_home_wins
+    GameTeam.percentage_home_wins.round(2)
   end
 
   def percentage_visitor_wins
-    GameTeam.percentage_visitor_wins
+    GameTeam.percentage_visitor_wins.round(2)
   end
 
   def percentage_ties
-    Game.percentage_ties
+    Game.percentage_ties.round(2)
   end
 
   def count_of_games_by_season
@@ -325,7 +325,7 @@ class StatTracker
 
   def least_accurate_team(season_id)
     teams_counter = accurate_team_calculation(season_id)
-    
+
     final = teams_counter.max_by do |key, value|
       value[:attempts].to_f / value[:goals]
     end[0]
