@@ -133,10 +133,6 @@ class StatTracker
     GameteamGameAggregable.winningest_coach(season_id, @game_teams, @games)
   end
 
-  def accurate_team_calculation(season_id)
-    GameteamGameTeamAggregable.accurate_team_calculation(season_id, @game_teams, @games, @teams)
-  end
-
   def least_accurate_team(season_id)
     GameteamGameTeamAggregable.least_accurate_team(season_id, @game_teams, @games, @teams)
   end
@@ -155,14 +151,6 @@ class StatTracker
 
   def fewest_tackles(season_id)
     GameteamGameTeamAggregable.fewest_tackles(season_id, @game_teams, @games, @teams)
-  end
-
-  def game_teams_postseason(season_type)
-    GameteamGameTeamAggregable.game_teams_postseason(season_type, @game_teams, @games, @teams)
-  end
-
-  def game_teams_regular_season(season_type)
-    GameteamGameTeamAggregable.game_teams_regular_season(season_type, @game_teams, @games, @teams)
   end
 
   def biggest_bust(season_type)

@@ -205,6 +205,9 @@ class StatTrackerTest < Minitest::Test
     assert_equal expected, @stat_tracker.seasonal_summary("16")
   end
 
+  def test_teamnameable
+    assert_equal "FC Dallas", @stat_tracker.id_to_teamname(6, @stat_tracker.teams)
+
   def test_biggest_blowout
     assert_equal 499, @stat_tracker.biggest_blowout
   end
