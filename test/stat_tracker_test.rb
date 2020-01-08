@@ -206,8 +206,6 @@ class StatTrackerTest < Minitest::Test
   end
 
   def test_teamnameable
-    assert_equal "FC Dallas", @stat_tracker.
-  end
-
+    assert_equal "FC Dallas", @stat_tracker.id_to_teamname(6, @stat_tracker.teams)
   end
 end
