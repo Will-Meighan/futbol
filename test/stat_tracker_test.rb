@@ -270,4 +270,9 @@ class StatTrackerTest < Minitest::Test
     team_goals = game_team_ids_games_and_goals(@stat_tracker.game_teams)
       assert_equal 2012020087, GameteamTeamAggregable.highest_scoring_incrementing(@stat_tracker.game_teams, team_goals)[0].game_id
   end
+
+  def test_defense_accumulator
+    result = {6=>{:games=>0, :goals_allowed=>0}, 3=>{:games=>0, :goals_allowed=>0}, 5=>{:games=>0, :goals_allowed=>0}, 16=>{:games=>0, :goals_allowed=>0}, 17=>{:games=>0, :goals_allowed=>0}, 14=>{:games=>0, :goals_allowed=>0}, 24=>{:games=>0, :goals_allowed=>0}, 20=>{:games=>0, :goals_allowed=>0}, 2=>{:games=>0, :goals_allowed=>0}, 1=>{:games=>0, :goals_allowed=>0}, 4=>{:games=>0,:goals_allowed=>0}, 15=>{:games=>0, :goals_allowed=>0}, 19=>{:games=>0, :goals_allowed=>0}, 26=>{:games=>0, :goals_allowed=>0}, 28=>{:games=>0, :goals_allowed=>0}, 30=>{:games=>0, :goals_allowed=>0}}
+    assert_equal result, GameTeamAggregable.defense_accumulator(@stat_tracker.games)
+  end
 end
