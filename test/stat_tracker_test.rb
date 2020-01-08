@@ -1,7 +1,10 @@
 require_relative 'test_helper'
 require_relative '../lib/stat_tracker'
+require './lib/calculable'
 
 class StatTrackerTest < Minitest::Test
+  include Calculable
+
   def setup
     @stat_tracker = StatTracker.from_csv({games: './data/dummy_game.csv', teams: './data/dummy_team.csv', game_teams: './data/dummy_game_team.csv'})
   end
@@ -256,5 +259,15 @@ class StatTrackerTest < Minitest::Test
     game_ids = [2012030221, 2012030222, 2012030223, 2012030224]
     result = {3=>{:goals=>0, :attempts=>0}, 6=>{:goals=>0, :attempts=>0}}
     assert_equal 2012020087, GameteamGameTeamAggregable.accuracy_incrementer(@stat_tracker.game_teams, game_ids, teams_counter)[0].game_id
+  end
+
+  def test_lowest_scoring_incrementing
+    all_teams = game_team_ids_games_and_goals(@stat_tracker.game_teams)
+    assert_equal 2012020087, GameteamTeamAggregable.lowest_scoring_incrementing(@stat_tracker.game_teams, all_teams)[0].game_id
+  end
+
+  def test_highest_scoring_incrementing
+    team_goals = game_team_ids_games_and_goals(@stat_tracker.game_teams)
+      assert_equal 2012020087, GameteamTeamAggregable.highest_scoring_incrementing(@stat_tracker.game_teams, team_goals)[0].game_id
   end
 end
