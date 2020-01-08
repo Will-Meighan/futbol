@@ -2,9 +2,11 @@ require_relative 'game_team'
 require_relative 'game'
 require_relative 'team'
 require_relative 'calculable'
+require_relative 'teamnameable'
 
 class StatTracker
   include Calculable
+  include Teamnameable
   attr_reader :game_path, :team_path, :game_teams_path, :game_teams, :games, :teams
 
   def self.from_csv(locations)
@@ -115,10 +117,7 @@ class StatTracker
     best_fans = unique_teams.min_by do |team|
       team[1]
     end
-
-    @teams.find do |team|
-      team.team_id == best_fans[0]
-    end.teamname
+      id_to_teamname(best_fans[0], @teams)
   end
 
   def best_offense
@@ -136,9 +135,7 @@ class StatTracker
       team_goal / game.to_f
     end
     best_o = average.max_by { |k, v| v }
-    @teams.find do |team|
-      team.team_id == best_o[0]
-    end.teamname
+    id_to_teamname(best_o[0], @teams)
   end
 
   def worst_offense
@@ -157,7 +154,7 @@ class StatTracker
       team_goal / game.to_f
     end
     worst_o = average.min_by { |k, v|  v }
-    (@teams.find { |team| team.team_id == worst_o[0] }).teamname
+    id_to_teamname(worst_o[0], @teams)
   end
 
   def highest_scoring_home_team
@@ -174,7 +171,7 @@ class StatTracker
     highest_team_id = team_goals.max_by do |k , v|
       v[:total_goals] / v[:total_games].to_f
     end[0]
-    (@teams.find { |team| team.team_id == highest_team_id }).teamname
+    id_to_teamname(highest_team_id, @teams)
   end
 
   def lowest_scoring_home_team
@@ -191,7 +188,7 @@ class StatTracker
     lowest_team_id = team_goals.min_by do |k , v|
       v[:total_goals] / v[:total_games].to_f
     end[0]
-    (@teams.find { |team| team.team_id == lowest_team_id }).teamname
+    id_to_teamname(lowest_team_id, @teams)
   end
 
   def winningest_team
@@ -209,7 +206,7 @@ class StatTracker
     winningest_team_id = team_win_percentage.max_by do |game_team, percentage|
       percentage
     end.first
-    (@teams.find { |team| team.team_id == winningest_team_id }).teamname
+    id_to_teamname(winningest_team_id, @teams)
   end
 
   def highest_scoring_visitor
@@ -224,7 +221,7 @@ class StatTracker
       highest_team_id = team_goals.max_by do |k , v|
       v[:total_goals] / v[:total_games].to_f
     end[0]
-    (@teams.find { |team| team.team_id == highest_team_id }).teamname
+    id_to_teamname(highest_team_id, @teams)
   end
 
   def lowest_scoring_visitor
@@ -239,7 +236,7 @@ class StatTracker
     worst_team = all_teams.min_by do |key, value|
       value[:total_goals] / value[:total_games].to_f
     end[0]
-    (@teams.find { |team| team.team_id == worst_team }).teamname
+    id_to_teamname(worst_team, @teams)
   end
 
   def worst_defense
@@ -257,7 +254,7 @@ class StatTracker
     final = teams_counter.max_by do |id, stats|
       stats[:goals_allowed].to_f / stats[:games]
     end[0]
-    (@teams.find { |team| team.team_id == final }).teamname
+    id_to_teamname(final, @teams)
   end
 
   def best_defense
@@ -275,7 +272,7 @@ class StatTracker
     final = teams_counter.min_by do |id, stats|
       stats[:goals_allowed].to_f / stats[:games]
     end[0]
-    (@teams.find { |team| team.team_id == final }).teamname
+    id_to_teamname(final, @teams)
   end
 
   def winningest_coach(season_id)
@@ -338,10 +335,7 @@ class StatTracker
    final = teams_counter.min_by do |key, value|
      value[:attempts].to_f / value[:goals]
    end[0]
-
-   @teams.find do |team|
-     final == team.team_id
-   end.teamname
+    id_to_teamname(final, @teams)
 end
 
   def worst_coach(season_id)
@@ -388,7 +382,7 @@ end
     team_with_most_tackles = all_teams.max_by do |team|
       team.last[:total_tackles]
     end
-    (@teams.find {|team| team.team_id == team_with_most_tackles.first}).teamname
+    id_to_teamname(team_with_most_tackles.first, @teams)
   end
 
   def fewest_tackles(season_id)
@@ -412,7 +406,7 @@ end
     team_with_least_tackles = all_teams.min_by do |team|
       team.last[:total_tackles]
     end
-    (@teams.find {|team| team.team_id == team_with_least_tackles.first}).teamname
+    id_to_teamname(team_with_least_tackles.first, @teams)
   end
 
   def game_teams_postseason(season_type)
@@ -424,7 +418,7 @@ end
   def game_teams_regular_season(season_type)
     regular_season = @games.find_all { |game| game.type == "Regular Season" && game.season == season_type}
     regular_season_ids = regular_season.map { |game| game.game_id }
-    @game_teams.find_all { |game_team| regular_season_ids.include?(game_team.game_id) }
+    @game_teams.find_all { |game_team| regular_season_ids.include?(game_team.game_id)}
   end
 
   def biggest_bust(season_type)
@@ -457,7 +451,7 @@ end
       postseason_team_wins.keys.include?(team.first)
     end
     team_with_biggest_bust = difference.max_by { |team| team.last }
-    (@teams.find {|team| team.team_id == team_with_biggest_bust.first}).teamname
+    id_to_teamname(team_with_biggest_bust.first, @teams)
   end
 
   def biggest_surprise(season_type)
@@ -490,7 +484,7 @@ end
       postseason_team_wins.keys.include?(team.first)
     end
     team_biggest_surprise = postseason_teams_only.max_by {|team| team.last}
-    (@teams.find {|team| team.team_id == team_biggest_surprise.first}).teamname
+    id_to_teamname(team_biggest_surprise.first, @teams)
   end
 
   def worst_loss(team_id)
