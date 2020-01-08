@@ -244,4 +244,10 @@ class StatTrackerTest < Minitest::Test
   def test_game_teams_regular_season
     assert_equal [], GameteamGameTeamAggregable.game_teams_regular_season("Regular Season", @stat_tracker.game_teams, @stat_tracker.games, @stat_tracker.teams)
   end
+
+  def test_teams_counter_hash_for_accuracy_methods
+    game_ids = [2012030221, 2012030222, 2012030223, 2012030224]
+    result = {3=>{:goals=>0, :attempts=>0}, 6=>{:goals=>0, :attempts=>0}}
+    assert_equal result, GameteamGameTeamAggregable.teams_counter_hash_for_accuracy_methods(@stat_tracker.game_teams, game_ids)
+  end
 end
