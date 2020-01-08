@@ -204,4 +204,40 @@ class StatTrackerTest < Minitest::Test
                 :average_goals_scored=>2.2, :average_goals_against=>1.6}}}
     assert_equal expected, @stat_tracker.seasonal_summary("16")
   end
+
+  def test_biggest_blowout
+    assert_equal 499, @stat_tracker.biggest_blowout
+  end
+
+  def test_percentage_visitor_wins
+    assert_equal 0.34, @stat_tracker.percentage_visitor_wins
+  end
+
+  def test_average_goals_by_season
+    result = {"20122013"=>22.04, "20142015"=>4.0, "20162017"=>4.75, "20152016"=>4.0, "20132014"=>5.0}
+    assert_equal result, @stat_tracker.average_goals_by_season
+  end
+
+  def test_count_of_teams
+    assert_equal 16, @stat_tracker.count_of_teams
+  end
+
+  def test_team_info
+    result = {"team_id"=>"24", "franchise_id"=>"32", "team_name"=>"Real Salt Lake", "abbreviation"=>"RSL", "link"=>"/api/v1/teams/24"}
+    assert_equal result, @stat_tracker.team_info("24")
+  end
+
+  def test_accurate_team_calculation
+    result = {24=>{:goals=>7, :attempts=>21}, 28=>{:goals=>2, :attempts=>4}, 16=>{:goals=>10, :attempts=>44}, 30=>{:goals=>5, :attempts=>19}, 19=>{:goals=>5, :attempts=>19}, 17=>{:goals=>10, :attempts=>32}, 2=>{:goals=>2, :attempts=>21}, 1=>{:goals=>5, :attempts=>12}, 14=>{:goals=>2, :attempts=>4}, 4=>{:goals=>3, :attempts=>8}, 15=>{:goals=>6, :attempts=>23}, 5=>{:goals=>8, :attempts=>46}, 3=>{:goals=>9, :attempts=>53}, 26=>{:goals=>2, :attempts=>12}, 6=>{:goals=>24, :attempts=>76}}
+
+    assert_equal result, @stat_tracker.accurate_team_calculation("20122013")
+  end
+
+  def test_game_teams_postseason
+    assert_equal [], @stat_tracker.game_teams_postseason("Postseason")
+  end
+
+  def test_game_teams_regular_season
+    assert_equal [], @stat_tracker.game_teams_regular_season("Regular Season")
+  end
 end
