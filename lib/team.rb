@@ -39,13 +39,4 @@ class Team
       "abbreviation" => final_team.abbreviation,
       "link" => final_team.link }
   end
-
-  def least_accurate_team(season_id)
-    teams_counter = accurate_team_calculation(season_id)
-
-    final = teams_counter.max_by do |key, value|
-      value[:attempts].to_f / value[:goals]
-    end[0]
-    (@@teams.find { |team| final == team.team_id }).teamname
-  end
 end

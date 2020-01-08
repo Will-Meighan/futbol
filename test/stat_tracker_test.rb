@@ -204,4 +204,10 @@ class StatTrackerTest < Minitest::Test
                 :average_goals_scored=>2.2, :average_goals_against=>1.6}}}
     assert_equal expected, @stat_tracker.seasonal_summary("16")
   end
+
+  def test_teamnameable
+    assert_equal "FC Dallas", @stat_tracker.
+  end
+
+  end
 end
