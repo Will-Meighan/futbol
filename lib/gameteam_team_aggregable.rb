@@ -117,19 +117,28 @@ module GameteamTeamAggregable
     (teams.find { |team| team.team_id == lowest_team_id }).teamname
   end
 
-  def self.winningest_team(game_teams, teams)
-    total_games_per_team = game_teams.reduce(Hash.new(0)) do |acc, game_team|
+  def self.total_games_per_team(game_teams, teams)
+    game_teams.reduce(Hash.new(0)) do |acc, game_team|
       acc[game_team.team_id] +=1
       acc
     end
-    total_team_wins = game_teams.reduce(Hash.new(0)) do |acc, game_team|
+  end
+
+  def self.total_team_wins(game_teams, teams)
+    game_teams.reduce(Hash.new(0)) do |acc, game_team|
       acc[game_team.team_id] += 1 if game_team.result == "WIN"
       acc
     end
-    team_win_percentage = total_team_wins.merge(total_games_per_team) do |game_team, wins, games|
+  end
+
+  def self.team_win_percentage(game_teams, teams)
+    total_team_wins(game_teams, teams).merge(total_games_per_team(game_teams, teams)) do |game_team, wins, games|
       (wins.to_f/games).round(2)
     end
-    winningest_team_id = team_win_percentage.max_by do |game_team, percentage|
+  end
+
+  def self.winningest_team(game_teams, teams)
+    winningest_team_id = team_win_percentage(game_teams, teams).max_by do |game_team, percentage|
       percentage
     end.first
     (teams.find { |team| team.team_id == winningest_team_id }).teamname
