@@ -275,4 +275,10 @@ class StatTrackerTest < Minitest::Test
     result = {6=>{:games=>0, :goals_allowed=>0}, 3=>{:games=>0, :goals_allowed=>0}, 5=>{:games=>0, :goals_allowed=>0}, 16=>{:games=>0, :goals_allowed=>0}, 17=>{:games=>0, :goals_allowed=>0}, 14=>{:games=>0, :goals_allowed=>0}, 24=>{:games=>0, :goals_allowed=>0}, 20=>{:games=>0, :goals_allowed=>0}, 2=>{:games=>0, :goals_allowed=>0}, 1=>{:games=>0, :goals_allowed=>0}, 4=>{:games=>0,:goals_allowed=>0}, 15=>{:games=>0, :goals_allowed=>0}, 19=>{:games=>0, :goals_allowed=>0}, 26=>{:games=>0, :goals_allowed=>0}, 28=>{:games=>0, :goals_allowed=>0}, 30=>{:games=>0, :goals_allowed=>0}}
     assert_equal result, GameTeamAggregable.defense_accumulator(@stat_tracker.games)
   end
+
+  def test_season_collector
+    result = {"20122013"=>{:game_ids=>[2012030221, 2012030222, 2012030223, 2012030224, 2012030225, 2012030311, 2012030312, 2012030313, 2012030314, 2012030231, 2012020122, 2012020521, 2012030182, 2012020087, 2012030151, 2012020142, 2012030183, 2012020104, 2012030111, 2012020089, 2012030131,2012030232, 2012030162, 2012030112, 2012030132, 2012030152, 2012030161], :wins=>0, :games=>0}, "20142015"=>{:game_ids=>[2014030411, 2014030412, 2014030413, 2014030414, 2014030415, 2014020348], :wins=>0, :games=>0}, "20162017"=>{:game_ids=>[2016030171, 2016030172, 2016030173, 2016030174], :wins=>0, :games=>0}, "20152016"=>{:game_ids=>[2015030181, 2015030182], :wins=>0, :games=>0}, "20132014"=>{:game_ids=>[2013020444], :wins=>0, :games=>0}}
+
+    assert_equal result, GameteamGameAggregable.season_collector(@stat_tracker.games)
+  end
 end
