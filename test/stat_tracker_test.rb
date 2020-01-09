@@ -1,7 +1,10 @@
 require_relative 'test_helper'
 require_relative '../lib/stat_tracker'
+require './lib/calculable'
 
 class StatTrackerTest < Minitest::Test
+  include Calculable
+
   def setup
     @stat_tracker = StatTracker.from_csv({games: './data/dummy_game.csv', teams: './data/dummy_team.csv', game_teams: './data/dummy_game_team.csv'})
   end
@@ -293,4 +296,37 @@ class StatTrackerTest < Minitest::Test
     assert_instance_of Hash, GameTeamAggregable.oppo_hash("6", @stat_tracker.games, @stat_tracker.teams)
   end
 
+  def test_teams_counter_hash_for_accuracy_methods
+    game_ids = [2012030221, 2012030222, 2012030223, 2012030224]
+    result = {3=>{:goals=>0, :attempts=>0}, 6=>{:goals=>0, :attempts=>0}}
+    assert_equal result, GameteamGameTeamAggregable.teams_counter_hash_for_accuracy_methods(@stat_tracker.game_teams, game_ids)
+  end
+
+  def test_accuracy_incrementer
+    teams_counter = {3=>{:goals=>0, :attempts=>0}, 6=>{:goals=>0, :attempts=>0}}
+    game_ids = [2012030221, 2012030222, 2012030223, 2012030224]
+    result = {3=>{:goals=>0, :attempts=>0}, 6=>{:goals=>0, :attempts=>0}}
+    assert_equal 2012020087, GameteamGameTeamAggregable.accuracy_incrementer(@stat_tracker.game_teams, game_ids, teams_counter)[0].game_id
+  end
+
+  def test_lowest_scoring_incrementing
+    all_teams = game_team_ids_games_and_goals(@stat_tracker.game_teams)
+    assert_equal 2012020087, GameteamTeamAggregable.lowest_scoring_incrementing(@stat_tracker.game_teams, all_teams)[0].game_id
+  end
+
+  def test_highest_scoring_incrementing
+    team_goals = game_team_ids_games_and_goals(@stat_tracker.game_teams)
+      assert_equal 2012020087, GameteamTeamAggregable.highest_scoring_incrementing(@stat_tracker.game_teams, team_goals)[0].game_id
+  end
+
+  def test_defense_accumulator
+    result = {6=>{:games=>0, :goals_allowed=>0}, 3=>{:games=>0, :goals_allowed=>0}, 5=>{:games=>0, :goals_allowed=>0}, 16=>{:games=>0, :goals_allowed=>0}, 17=>{:games=>0, :goals_allowed=>0}, 14=>{:games=>0, :goals_allowed=>0}, 24=>{:games=>0, :goals_allowed=>0}, 20=>{:games=>0, :goals_allowed=>0}, 2=>{:games=>0, :goals_allowed=>0}, 1=>{:games=>0, :goals_allowed=>0}, 4=>{:games=>0,:goals_allowed=>0}, 15=>{:games=>0, :goals_allowed=>0}, 19=>{:games=>0, :goals_allowed=>0}, 26=>{:games=>0, :goals_allowed=>0}, 28=>{:games=>0, :goals_allowed=>0}, 30=>{:games=>0, :goals_allowed=>0}}
+    assert_equal result, GameTeamAggregable.defense_accumulator(@stat_tracker.games)
+  end
+
+  def test_season_collector
+    result = {"20122013"=>{:game_ids=>[2012030221, 2012030222, 2012030223, 2012030224, 2012030225, 2012030311, 2012030312, 2012030313, 2012030314, 2012030231, 2012020122, 2012020521, 2012030182, 2012020087, 2012030151, 2012020142, 2012030183, 2012020104, 2012030111, 2012020089, 2012030131,2012030232, 2012030162, 2012030112, 2012030132, 2012030152, 2012030161], :wins=>0, :games=>0}, "20142015"=>{:game_ids=>[2014030411, 2014030412, 2014030413, 2014030414, 2014030415, 2014020348], :wins=>0, :games=>0}, "20162017"=>{:game_ids=>[2016030171, 2016030172, 2016030173, 2016030174], :wins=>0, :games=>0}, "20152016"=>{:game_ids=>[2015030181, 2015030182], :wins=>0, :games=>0}, "20132014"=>{:game_ids=>[2013020444], :wins=>0, :games=>0}}
+
+    assert_equal result, GameteamGameAggregable.season_collector(@stat_tracker.games)
+  end
 end
