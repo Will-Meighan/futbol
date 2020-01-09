@@ -31,8 +31,16 @@ class GameTest < Minitest::Test
   end
 
   def test_it_can_count_the_number_of_games_in_a_season
-    assert_equal ({"20122013"=>27, "20142015"=>6, "20162017"=>4, "20152016"=>2, "20132014"=>1}), Game.count_of_games_by_season
-    assert_instance_of Hash, Game.count_of_games_by_season
+    game1 = mock("game")
+    game2 = mock("game")
+    game3 = mock("game")
+    game1.stubs(:season).returns("20122013")
+    game2.stubs(:season).returns("20122013")
+    game3.stubs(:season).returns("20142015")
+
+    attributes = [game1, game2, game3]
+    assert_equal ({"20122013"=>2, "20142015"=>1}), Game.count_of_games_by_season(attributes)
+    assert_instance_of Hash, Game.count_of_games_by_season(attributes)
   end
 
   def test_it_can_calcualte_the_average_number_of_goals_per_game_accross_all_games

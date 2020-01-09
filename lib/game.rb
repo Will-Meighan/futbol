@@ -41,13 +41,6 @@ class Game
     least_goals.home_goals + least_goals.away_goals
   end
 
-  # def self.count_of_games_by_season
-  #   @@games.reduce(Hash.new(0)) do |acc, game_1|
-  #     acc[game_1.season] += 1
-  #     acc
-  #   end
-  # end
-
   def self.average_goals_per_game
     total_games = 0
     total_goals = @@games.reduce(0) do |acc, game|
@@ -63,7 +56,7 @@ class Game
       acc[game.season] += (game.home_goals + game.away_goals)
       acc
     end
-    self.count_of_games_by_season(@@games).merge(goal_count_per_season) do |key, game_count, goal_count|
+    count_of_games_by_season(@@games).merge(goal_count_per_season) do |key, game_count, goal_count|
       average_of(goal_count, game_count).round(2)
     end
   end
