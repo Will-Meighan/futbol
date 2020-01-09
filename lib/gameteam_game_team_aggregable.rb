@@ -51,20 +51,24 @@ module GameteamGameTeamAggregable
      end.teamname
   end
 
-  def self.most_tackles(season_id, game_teams, games, teams)
+  def self.game_id_tackles(season_id, game_teams, games, teams)
     game_ids = []
     games.find_all do |game|
       if game.season == season_id
         game_ids << game.game_id
       end
     end
+    game_ids
+  end
+
+  def self.most_tackles(season_id, game_teams, games, teams)
     all_teams = game_teams.reduce({}) do |acc, game_team|
       acc[game_team.team_id] = {total_tackles: 0}
       acc
     end
     game_teams.each do |game_team|
-      if game_ids.include?(game_team.game_id)
-    all_teams[game_team.team_id][:total_tackles] += game_team.tackles
+      if game_id_tackles(season_id, game_teams, games, teams).include?(game_team.game_id)
+        all_teams[game_team.team_id][:total_tackles] += game_team.tackles
       end
     end
     team_with_most_tackles = all_teams.max_by do |team|
@@ -74,20 +78,14 @@ module GameteamGameTeamAggregable
   end
 
   def self.fewest_tackles(season_id, game_teams, games, teams)
-    game_ids = []
-    games.find_all do |game|
-      if game.season == season_id
-        game_ids << game.game_id
-      end
-    end
     all_teams = game_teams.reduce({}) do |acc, game_team|
-      if game_ids.include?(game_team.game_id)
+      if game_id_tackles(season_id, game_teams, games, teams).include?(game_team.game_id)
         acc[game_team.team_id] = {total_tackles: 0}
       end
       acc
     end
     game_teams.each do |game_team|
-      if all_teams[game_team.team_id] && game_ids.include?(game_team.game_id)
+      if all_teams[game_team.team_id] && game_id_tackles(season_id, game_teams, games, teams).include?(game_team.game_id)
         all_teams[game_team.team_id][:total_tackles] += game_team.tackles
       end
     end

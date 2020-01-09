@@ -329,4 +329,8 @@ class StatTrackerTest < Minitest::Test
 
     assert_equal result, GameteamGameAggregable.season_collector(@stat_tracker.games)
   end
+
+  def test_game_id_tackles
+    assert_equal [2012030221, 2012030222, 2012030223, 2012030224, 2012030225, 2012030311, 2012030312, 2012030313, 2012030314, 2012030231, 2012020122, 2012020521, 2012030182, 2012020087, 2012030151, 2012020142, 2012030183, 2012020104, 2012030111, 2012020089, 2012030131, 2012030232, 2012030162, 2012030112, 2012030132, 2012030152, 2012030161], GameteamGameTeamAggregable.game_id_tackles("20122013", @stat_tracker.game_teams, @stat_tracker.games, @stat_tracker.teams)
+  end
 end
