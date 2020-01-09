@@ -58,7 +58,7 @@ class StatTracker
   end
 
   def count_of_games_by_season
-    Game.count_of_games_by_season
+    Game.count_of_games_by_season(@games)
   end
 
   def average_goals_by_season

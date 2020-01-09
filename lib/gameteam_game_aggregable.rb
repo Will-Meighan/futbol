@@ -106,7 +106,6 @@ module GameteamGameAggregable
     (all_seasons.max_by { |key, value| value[:wins].to_f / value[:games] })[0]
   end
 
-
   def self.worst_season(team_id, game_teams, games)
     all_seasons = season_collector(games)
     game_teams.each do |game_team|
