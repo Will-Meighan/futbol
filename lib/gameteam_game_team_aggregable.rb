@@ -43,6 +43,22 @@ module GameteamGameTeamAggregable
     game_ids
   end
 
+  # def self.most_tackles(season_id, game_teams, games, teams)
+  #   all_teams = game_teams.reduce({}) do |acc, game_team|
+  #     acc[game_team.team_id] = {total_tackles: 0}
+  #     acc
+  #   end
+  #   game_teams.each do |game_team|
+  #     if game_id_tackles(season_id, game_teams, games, teams).include?(game_team.game_id)
+  #       all_teams[game_team.team_id][:total_tackles] += game_team.tackles
+  #     end
+  #   end
+  #   team_with_most_tackles = all_teams.max_by do |team|
+  #     team.last[:total_tackles]
+  #   end
+  #   (teams.find {|team| team.team_id == team_with_most_tackles.first}).teamname
+  # end
+
   def self.most_tackles(season_id, game_teams, games, teams)
     all_teams = game_teams.reduce({}) do |acc, game_team|
       acc[game_team.team_id] = {total_tackles: 0}
