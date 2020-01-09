@@ -3,12 +3,17 @@ require_relative 'calculable'
 module GameTeamAggregable
   extend Calculable
 
-  def self.worst_defense(games, teams)
+  def self.defense_accumulator(games)
     teams_counter = games.reduce({}) do |acc, game|
       acc[game.home_team_id] = {games: 0, goals_allowed: 0}
       acc[game.away_team_id] = {games: 0, goals_allowed: 0}
       acc
     end
+  end
+
+  def self.worst_defense(games, teams)
+    teams_counter = defense_accumulator(games)
+
     games.each do |game|
       teams_counter[game.home_team_id][:games] += 1
       teams_counter[game.away_team_id][:games] += 1
@@ -22,11 +27,7 @@ module GameTeamAggregable
   end
 
   def self.best_defense(games, teams)
-    teams_counter = games.reduce({}) do |acc, game|
-      acc[game.home_team_id] = {games: 0, goals_allowed: 0}
-      acc[game.away_team_id] = {games: 0, goals_allowed: 0}
-      acc
-    end
+    teams_counter = defense_accumulator(games)
     games.each do |game|
       teams_counter[game.home_team_id][:games] += 1
       teams_counter[game.away_team_id][:games] += 1
