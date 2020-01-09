@@ -40,12 +40,15 @@ module GameTeamAggregable
     (teams.find { |team| team.team_id == final }).teamname
   end
 
-  def self.head_to_head(id, games, teams)
-    opponent_hash = Hash.new
-    relavent_games = games.find_all do |game|
+  def self.relavent_games(id, games, teams)
+    games.find_all do |game|
       game.away_team_id == id.to_i || game.home_team_id == id.to_i
     end
-    relavent_games.each do |game|
+  end
+
+  def self.oppo_hash(id, games, teams)
+    opponent_hash = Hash.new
+    relavent_games(id, games, teams).each do |game|
       opponent_id = game.home_team_id if game.home_team_id != id.to_i
       opponent_id = game.away_team_id if game.home_team_id == id.to_i
       opponent_hash[opponent_id] ||= opponent_hash[opponent_id] = {"Wins" => [], "Losses" => []}
@@ -57,8 +60,12 @@ module GameTeamAggregable
         opponent_hash[opponent_id]["Losses"] << game if game.away_goals < game.home_goals || game.away_goals == game.home_goals
       end
     end
+    opponent_hash
+  end
+
+  def self.head_to_head(id, games, teams)
     win_perc_hash = Hash.new
-    opponent_hash.each do |opponent_id, win_loss_hash|
+    oppo_hash(id, games, teams).each do |opponent_id, win_loss_hash|
       teams.find do |team|
         if team.team_id == opponent_id
           win_perc_hash[team.teamname] = (win_loss_hash["Wins"].length / win_loss_hash.values.flatten.length.to_f).round(2)

@@ -241,11 +241,59 @@ class StatTrackerTest < Minitest::Test
   end
 
   def test_game_teams_postseason
-    assert_equal [], GameteamGameTeamAggregable.game_teams_postseason("Postseason", @stat_tracker.game_teams, @stat_tracker.games, @stat_tracker.teams)
+    assert_instance_of Array, GameteamGameTeamAggregable.game_teams_postseason("20122013", @stat_tracker.game_teams, @stat_tracker.games, @stat_tracker.teams)
   end
 
   def test_game_teams_regular_season
-    assert_equal [], GameteamGameTeamAggregable.game_teams_regular_season("Regular Season", @stat_tracker.game_teams, @stat_tracker.games, @stat_tracker.teams)
+    assert_instance_of Array, GameteamGameTeamAggregable.game_teams_regular_season("20122013", @stat_tracker.game_teams, @stat_tracker.games, @stat_tracker.teams)
+  end
+
+  def test_postseason_games_per_team
+    assert_equal ({5=>6, 2=>2, 3=>7, 15=>2, 30=>2, 16=>4, 24=>2, 17=>4, 19=>2, 26=>2, 6=>9}), GameteamGameTeamAggregable.postseason_games_per_team("20122013", @stat_tracker.game_teams, @stat_tracker.games, @stat_tracker.teams)
+  end
+
+  def test_postseason_team_wins
+    assert_equal ({5=>2, 15=>2, 16=>3, 24=>1, 17=>2, 19=>1, 26=>1, 6=>9}), GameteamGameTeamAggregable.postseason_team_wins("20122013", @stat_tracker.game_teams, @stat_tracker.games, @stat_tracker.teams)
+  end
+
+  def test_postseason_win_percentage
+    assert_equal ({5=>0.3333333333333333, 2=>2, 3=>7, 15=>1.0, 30=>2, 16=>0.75, 24=>0.5, 17=>0.5, 19=>0.5, 26=>0.5, 6=>1.0}), GameteamGameTeamAggregable.postseason_win_percentage("20122013", @stat_tracker.game_teams, @stat_tracker.games, @stat_tracker.teams)
+  end
+
+  def test_regular_season_games_per_team
+    assert_equal ({24=>1, 28=>1, 16=>1, 30=>1, 19=>1, 17=>1, 2=>1, 1=>2, 14=>1, 4=>1, 15=>1}), GameteamGameTeamAggregable.regular_season_games_per_team("20122013", @stat_tracker.game_teams, @stat_tracker.games, @stat_tracker.teams)
+  end
+
+  def test_regular_season_team_wins
+    assert_equal ({1=>1, 4=>1}), GameteamGameTeamAggregable.regular_season_team_wins("20122013", @stat_tracker.game_teams, @stat_tracker.games, @stat_tracker.teams)
+  end
+
+  def test_regular_season_win_percentage
+    assert_equal ({24=>1, 28=>1, 16=>1, 30=>1, 19=>1, 17=>1, 2=>1, 1=>0.5, 14=>1, 4=>1.0, 15=>1}), GameteamGameTeamAggregable.regular_season_win_percentage("20122013", @stat_tracker.game_teams, @stat_tracker.games, @stat_tracker.teams)
+  end
+
+  def test_difference
+    assert_equal ({24=>-0.5, 28=>1, 16=>-0.25, 30=>1, 19=>-0.5, 17=>-0.5, 2=>1, 1=>0.5, 14=>1, 4=>1.0, 15=>0.0, 5=>0.3333333333333333, 3=>7, 26=>0.5, 6=>1.0}), GameteamGameTeamAggregable.difference("20122013", @stat_tracker.game_teams, @stat_tracker.games, @stat_tracker.teams)
+  end
+
+  def test_total_games_per_team
+    assert_equal ({24=>7, 28=>3, 16=>11, 30=>3, 19=>3, 17=>5, 2=>3, 1=>3, 14=>7, 4=>2, 15=>3, 5=>6, 3=>9, 26=>4, 6=>9, 20=>4}), GameteamTeamAggregable.total_games_per_team(@stat_tracker.game_teams, @stat_tracker.teams)
+  end
+
+  def test_total_team_wins
+    assert_equal ({24=>7, 28=>3, 16=>11, 30=>3, 19=>3, 17=>5, 2=>3, 1=>3, 14=>7, 4=>2, 15=>3, 5=>6, 3=>9, 26=>4, 6=>9, 20=>4}), GameteamTeamAggregable.total_games_per_team(@stat_tracker.game_teams, @stat_tracker.teams)
+  end
+
+  def test_team_win_percentage
+    assert_equal ({24=>7, 28=>3, 16=>11, 30=>3, 19=>3, 17=>5, 2=>3, 1=>3, 14=>7, 4=>2, 15=>3, 5=>6, 3=>9, 26=>4, 6=>9, 20=>4}), GameteamTeamAggregable.total_games_per_team(@stat_tracker.game_teams, @stat_tracker.teams)
+  end
+
+  def test_relavent_games
+    assert_instance_of Array, GameTeamAggregable.relavent_games("6", @stat_tracker.games, @stat_tracker.teams)
+  end
+
+  def test_oppo_hash
+    assert_instance_of Hash, GameTeamAggregable.oppo_hash("6", @stat_tracker.games, @stat_tracker.teams)
   end
 
   def test_teams_counter_hash_for_accuracy_methods
