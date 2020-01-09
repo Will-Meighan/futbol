@@ -5,7 +5,6 @@ module GameteamTeamAggregable
 
   def self.worst_fans(game_teams, teams)
     unique_teams = game_team_ids_away_home(game_teams)
-
     game_teams.each do |game_team|
       if game_team.hoa == "away" && game_team.result == "WIN"
         unique_teams[game_team.team_id][:away] += 1
@@ -13,19 +12,15 @@ module GameteamTeamAggregable
         unique_teams[game_team.team_id][:home] += 1
       end
     end
-
     worst_fans_are = unique_teams.find_all do |key, value|
       value[:away] > value[:home]
     end.to_h
-
     worst_teams = worst_fans_are.to_h.keys
-
     final = worst_teams.map do |team2|
       teams.find do |team1|
         team2 == team1.team_id
       end
     end
-
     final.map { |team| team.teamname }
   end
 
@@ -34,20 +29,17 @@ module GameteamTeamAggregable
     game_teams.each do |game_team|
       unique_teams[game_team.team_id] += 1 if game_team.hoa == "away" && game_team.result == "WIN"
     end
-
     best_fans = unique_teams.min_by do |team|
       team[1]
     end
-
     teams.find do |team|
       team.team_id == best_fans[0]
     end.teamname
   end
 
-  def self.best_offense(game_teams, teams)
+  def self.offense_collection(game_teams, teams)
     team_goals = game_team_ids(game_teams, 0)
-
-     game_teams.each do |game_team|
+    game_teams.each do |game_team|
       team_goals[game_team.team_id] += game_team.goals
     end
     total_games = game_teams.reduce({}) do |acc, game_team|
@@ -55,31 +47,19 @@ module GameteamTeamAggregable
       acc
     end
     game_teams.each { |game_team| total_games[game_team.team_id] += 1 }
-    average = team_goals.merge(total_games) do |key, team_goal, game|
+    team_goals.merge(total_games) do |key, team_goal, game|
       team_goal / game.to_f
     end
-    best_o = average.max_by { |k, v| v }
+  end
+
+  def self.best_offense(game_teams, teams)
     teams.find do |team|
-      team.team_id == best_o[0]
+      team.team_id == offense_collection(game_teams, teams).max_by { |k, v| v }[0]
     end.teamname
   end
 
   def self.worst_offense(game_teams, teams)
-    team_goals = game_team_ids(game_teams, 0)
-
-     game_teams.each do |game_team|
-
-      team_goals[game_team.team_id] += game_team.goals
-    end
-    total_games = game_teams.reduce({}) do |acc, game_team|
-      acc[game_team.team_id] = 0
-      acc
-    end
-    game_teams.each { |game_team| total_games[game_team.team_id] += 1 }
-    average = team_goals.merge(total_games) do |key, team_goal, game|
-      team_goal / game.to_f
-    end
-    worst_o = average.min_by { |k, v|  v }
+    worst_o = offense_collection(game_teams, teams).min_by { |k, v|  v }
     (teams.find { |team| team.team_id == worst_o[0] }).teamname
   end
 
