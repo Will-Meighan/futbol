@@ -42,10 +42,7 @@ module GameteamTeamAggregable
     game_teams.each do |game_team|
       team_goals[game_team.team_id] += game_team.goals
     end
-    total_games = game_teams.reduce({}) do |acc, game_team|
-      acc[game_team.team_id] = 0
-      acc
-    end
+    total_games = game_team_ids(game_teams, 0)
     game_teams.each { |game_team| total_games[game_team.team_id] += 1 }
     team_goals.merge(total_games) do |key, team_goal, game|
       team_goal / game.to_f
@@ -64,10 +61,7 @@ module GameteamTeamAggregable
   end
 
   def self.highest_scoring_home_team(game_teams, teams)
-    team_goals = game_teams.reduce({}) do |acc, game_team|
-      acc[game_team.team_id] = {:total_games => 0, :total_goals => 0}
-      acc
-    end
+    team_goals = game_teams_collection_total_goals_and_games(game_teams)
     game_teams.each do |game_team|
       if game_team.hoa == "home"
         team_goals[game_team.team_id][:total_games] += 1
@@ -81,10 +75,7 @@ module GameteamTeamAggregable
   end
 
   def self.lowest_scoring_home_team(game_teams, teams)
-    team_goals = game_teams.reduce({}) do |acc, game_team|
-      acc[game_team.team_id] = {:total_games => 0, :total_goals => 0}
-      acc
-    end
+    team_goals = game_teams_collection_total_goals_and_games(game_teams)
     game_teams.each do |game_team|
       if game_team.hoa == "home"
         team_goals[game_team.team_id][:total_games] += 1
@@ -98,10 +89,7 @@ module GameteamTeamAggregable
   end
 
   def self.total_games_per_team(game_teams, teams)
-    game_teams.reduce(Hash.new(0)) do |acc, game_team|
-      acc[game_team.team_id] +=1
-      acc
-    end
+    hash_creation_and_accumulation_total_goals_per_game(game_teams)
   end
 
   def self.total_team_wins(game_teams, teams)

@@ -3,24 +3,6 @@ require_relative 'calculable'
 module GameteamGameTeamAggregable
   extend Calculable
 
-  def self.teams_counter_hash_for_accuracy_methods(game_teams, game_ids)
-    game_teams.reduce({}) do |acc, game_team|
-      if game_ids.include?(game_team.game_id)
-        acc[game_team.team_id] = {goals: 0, attempts: 0}
-      end
-      acc
-    end
-  end
-
-  def self.accuracy_incrementer(game_teams, game_ids, teams_counter)
-    game_teams.each do |game_team|
-      if game_ids.include?(game_team.game_id)
-        teams_counter[game_team.team_id][:goals] += game_team.goals
-        teams_counter[game_team.team_id][:attempts] += game_team.shots
-      end
-    end
-  end
-
   def self.accurate_team_calculation(season_id, game_teams, games, teams)
     game_ids = []
     games.each do |game|
@@ -62,30 +44,68 @@ module GameteamGameTeamAggregable
   end
 
   def self.most_tackles(season_id, game_teams, games, teams)
-    all_teams = game_teams.reduce({}) do |acc, game_team|
-      acc[game_team.team_id] = {total_tackles: 0}
-      acc
-    end
-    game_teams.each do |game_team|
-      if game_id_tackles(season_id, game_teams, games, teams).include?(game_team.game_id)
-        all_teams[game_team.team_id][:total_tackles] += game_team.tackles
+    game_ids = []
+    games.find_all do |game|
+      if game.season == season_id
+        game_ids << game.game_id
       end
     end
-    team_with_most_tackles = all_teams.max_by do |team|
-      team.last[:total_tackles]
-    end
-    (teams.find {|team| team.team_id == team_with_most_tackles.first}).teamname
-  end
-
-  def self.fewest_tackles(season_id, game_teams, games, teams)
     all_teams = game_teams.reduce({}) do |acc, game_team|
-      if game_id_tackles(season_id, game_teams, games, teams).include?(game_team.game_id)
+      if game_ids.include?(game_team.game_id)
         acc[game_team.team_id] = {total_tackles: 0}
       end
       acc
     end
     game_teams.each do |game_team|
-      if all_teams[game_team.team_id] && game_id_tackles(season_id, game_teams, games, teams).include?(game_team.game_id)
+      if all_teams[game_team.team_id] && game_ids.include?(game_team.game_id)
+        all_teams[game_team.team_id][:total_tackles] += game_team.tackles
+      end
+    end
+    team_with_least_tackles = all_teams.max_by do |team|
+      team.last[:total_tackles]
+    end
+    (teams.find {|team| team.team_id == team_with_least_tackles.first}).teamname
+  end
+
+  def self.fewest_tackles(season_id, game_teams, games, teams)
+    game_ids = []
+    games.find_all do |game|
+      if game.season == season_id
+        game_ids << game.game_id
+      end
+    end
+    all_teams = game_teams.reduce({}) do |acc, game_team|
+      if game_ids.include?(game_team.game_id)
+        acc[game_team.team_id] = {total_tackles: 0}
+      end
+      acc
+    end
+    game_teams.each do |game_team|
+      if all_teams[game_team.team_id] && game_ids.include?(game_team.game_id)
+        all_teams[game_team.team_id][:total_tackles] += game_team.tackles
+      end
+    end
+    team_with_least_tackles = all_teams.min_by do |team|
+      team.last[:total_tackles]
+    end
+    (teams.find {|team| team.team_id == team_with_least_tackles.first}).teamname
+  end
+
+  def self.fewest_tackles(season_id, game_teams, games, teams)
+    game_ids = []
+    games.find_all do |game|
+      if game.season == season_id
+        game_ids << game.game_id
+      end
+    end
+    all_teams = game_teams.reduce({}) do |acc, game_team|
+      if game_ids.include?(game_team.game_id)
+        acc[game_team.team_id] = {total_tackles: 0}
+      end
+      acc
+    end
+    game_teams.each do |game_team|
+      if all_teams[game_team.team_id] && game_ids.include?(game_team.game_id)
         all_teams[game_team.team_id][:total_tackles] += game_team.tackles
       end
     end

@@ -31,8 +31,16 @@ class GameTest < Minitest::Test
   end
 
   def test_it_can_count_the_number_of_games_in_a_season
-    assert_equal ({"20122013"=>27, "20142015"=>6, "20162017"=>4, "20152016"=>2, "20132014"=>1}), Game.count_of_games_by_season
-    assert_instance_of Hash, Game.count_of_games_by_season
+    game1 = mock("game")
+    game2 = mock("game")
+    game3 = mock("game")
+    game1.stubs(:season).returns("20122013")
+    game2.stubs(:season).returns("20122013")
+    game3.stubs(:season).returns("20142015")
+
+    attributes = [game1, game2, game3]
+    assert_equal ({"20122013"=>2, "20142015"=>1}), Game.count_of_games_by_season(attributes)
+    assert_instance_of Hash, Game.count_of_games_by_season(attributes)
   end
 
   def test_it_can_calcualte_the_average_number_of_goals_per_game_accross_all_games
@@ -51,5 +59,30 @@ class GameTest < Minitest::Test
 
   def test_it_can_calculate_the_percentage_of_games_that_end_in_a_tie
     assert_equal 0.13, Game.percentage_ties
+  end
+
+  def test_seasonal_summary_data
+    assert_equal ({}), Game.seasonal_summary_data("23")
+  end
+
+  def test_seasonal_accumulation_of_data
+    assert_equal 2012030221, Game.seasonal_accumulation_of_data("23", Game.seasonal_summary_data("23"))[0].game_id
+  end
+
+  def test_seasonal_summary_assignment
+    data = mock("data")
+    data.stubs(:hash).returns({})
+    assert_equal ({}), Game.seasonal_summary_assignment(data.hash)
+  end
+
+  def test_seasonal_summary_value_assignment
+    summary = mock("summary")
+    data = mock("data")
+    summary.stubs(:summary).returns({"20122013" => {:regular_season=>{:win_percentage=>0.0, :total_goals_scored=>0, :total_goals_against=>0, :average_goals_scored=>0.0,:average_goals_against=>0.0}, :postseason=>{:win_percentage=>0.0, :total_goals_scored=>0, :total_goals_against=>0, :average_goals_scored=>0.0, :average_goals_against=>0.0}}})
+    data.stubs(:data).returns({"20122013" => {"Regular Season"=>{:total_games=>1, :total_goals_scored=>2, :total_goals_against=>2, :wins=>0}, "Postseason"=>{:total_games=>4, :total_goals_scored=>8, :total_goals_against=>6, :wins=>3}}})
+
+    result = {"20122013"=>{:regular_season=>{:win_percentage=>0.0, :total_goals_scored=>2, :total_goals_against=>2, :average_goals_scored=>2.0, :average_goals_against=>2.0}, :postseason=>{:win_percentage=>0.75, :total_goals_scored=>8, :total_goals_against=>6, :average_goals_scored=>2.0, :average_goals_against=>1.5}}}
+
+    assert_equal result, Game.seasonal_summary_value_assignment(summary.summary, data.data)
   end
 end
