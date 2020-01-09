@@ -83,14 +83,18 @@ module GameteamGameAggregable
     all_abs_vals.max
   end
 
-  def self.best_season(team_id, game_teams, games)
-    all_seasons = games.reduce({}) do |acc, game|
+  def self.season_collector(games)
+    games.reduce({}) do |acc, game|
       if acc[game.season] == nil
         acc[game.season] = {game_ids: [], wins: 0, games: 0}
       end
       acc[game.season][:game_ids] << game.game_id
       acc
     end
+  end
+
+  def self.best_season(team_id, game_teams, games)
+    all_seasons = season_collector(games)
     game_teams.each do |game_team|
       season = all_seasons.find do |key, value|
         value[:game_ids].include?(game_team.game_id)
@@ -102,14 +106,9 @@ module GameteamGameAggregable
     (all_seasons.max_by { |key, value| value[:wins].to_f / value[:games] })[0]
   end
 
+
   def self.worst_season(team_id, game_teams, games)
-    all_seasons = games.reduce({}) do |acc, game|
-      if acc[game.season] == nil
-        acc[game.season] = {game_ids: [], wins: 0, games: 0}
-      end
-      acc[game.season][:game_ids] << game.game_id
-      acc
-    end
+    all_seasons = season_collector(games)
     game_teams.each do |game_team|
       season = all_seasons.find do |key, value|
         value[:game_ids].include?(game_team.game_id)
