@@ -135,30 +135,37 @@ module GameteamTeamAggregable
     (teams.find { |team| team.team_id == winningest_team_id }).teamname
   end
 
-  def self.highest_scoring_visitor(game_teams, teams)
-    team_goals = game_team_ids_games_and_goals(game_teams)
-
+  def self.highest_scoring_incrementing(game_teams, team_goals)
     game_teams.each do |game_team|
       if game_team.hoa == "away"
         team_goals[game_team.team_id][:total_games] += 1
         team_goals[game_team.team_id][:total_goals] += game_team.goals
       end
     end
+  end
+
+  def self.highest_scoring_visitor(game_teams, teams)
+    team_goals = game_team_ids_games_and_goals(game_teams)
+    highest_scoring_incrementing(game_teams, team_goals)
       highest_team_id = team_goals.max_by do |k , v|
       v[:total_goals] / v[:total_games].to_f
     end[0]
     (teams.find { |team| team.team_id == highest_team_id }).teamname
   end
 
-  def self.lowest_scoring_visitor(game_teams, teams)
-    all_teams = game_team_ids_games_and_goals(game_teams)
-
+  def self.lowest_scoring_incrementing(game_teams, all_teams)
     game_teams.each do |game_team|
       if game_team.hoa == "away"
         all_teams[game_team.team_id][:total_games] += 1
         all_teams[game_team.team_id][:total_goals] += game_team.goals
       end
     end
+  end
+
+  def self.lowest_scoring_visitor(game_teams, teams)
+    all_teams = game_team_ids_games_and_goals(game_teams)
+    lowest_scoring_incrementing(game_teams, all_teams)
+
     worst_team = all_teams.min_by do |key, value|
       value[:total_goals] / value[:total_games].to_f
     end[0]
