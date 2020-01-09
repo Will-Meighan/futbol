@@ -13,7 +13,6 @@ module GameTeamAggregable
 
   def self.worst_defense(games, teams)
     teams_counter = defense_accumulator(games)
-
     games.each do |game|
       teams_counter[game.home_team_id][:games] += 1
       teams_counter[game.away_team_id][:games] += 1

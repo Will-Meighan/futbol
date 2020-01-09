@@ -28,7 +28,6 @@ module GameteamGameTeamAggregable
         game_ids << game.game_id
       end
     end
-
     teams_counter = teams_counter_hash_for_accuracy_methods(game_teams, game_ids)
     accuracy_incrementer(game_teams, game_ids, teams_counter)
     teams_counter
@@ -44,11 +43,9 @@ module GameteamGameTeamAggregable
 
   def self.most_accurate_team(season_id, game_teams, games, teams)
      teams_counter = accurate_team_calculation(season_id, game_teams, games, teams)
-
      final = teams_counter.min_by do |key, value|
        value[:attempts].to_f / value[:goals]
      end[0]
-
      teams.find do |team|
        final == team.team_id
      end.teamname
